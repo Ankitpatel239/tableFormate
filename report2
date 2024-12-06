@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Dynamic Table</title>
+</head>
+<body>
+  <div class="bg-background text-primary-foreground min-h-screen flex flex-col items-center justify-center">
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse border border-border">
+        <thead id="table-header">
+        </thead>
+        <tbody id="table-body">
+          </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const tableConfig = {
+  columns: [
+    { key: "fatherOrHusband", label: "Father/Husband", rowspan: 3, colspan: 1 },
+    {
+      key: "internal",
+      label: "Internal",
+      rowspan: 3,
+      colspan: 6,
+      subColumns: [
+        { key: "attendance", label: "Attendance", rowspan: 2, },
+        {
+          key: "practicalRecord",
+          label: "Practical Record",
+          colspan: 3,
+          subColumns: [
+            { key: "practical", label: "Practical" },
+            { key: "viva", label: "Viva" },
+            { key: "total", label: "Total" },
+          ],
+        },
+        { key: "viva", label: "Viva", rowspan: 2, },
+        { key: "total", label: "Total", rowspan: 2, },
+        
+      ],
+    },
+    {
+      key: "external",
+      label: "External",
+      colspan: 3,
+      subColumns: [
+        { key: "practical", label: "Practical" , rowspan: 2,},
+        { key: "vivaVoce", label: "Viva Voce", rowspan: 2, },
+        { key: "total", label: "Total", rowspan: 2, },
+      ],
+    },
+    { key: "grandTotal", label: "Grand Total", rowspan: 3, colspan: 1 },
+  ],
+  data: [
+    ["Ankit", 10, 20, 15, 35, 10, 55, 40, 20, 60, 115],
+    ["Rahul", 15, 10, 10, 20, 5, 40, 30, 15, 45, 85],
+  ],
+};
+
+    const tableHeader = document.getElementById("table-header");
+    const tableBody = document.getElementById("table-body");
+
+    const createHeader = (columns, rowSpan = 1) => {
+      const rows = [];
+      const processColumn = (col, depth = 0) => {
+        if (!rows[depth]) rows[depth] = [];
+        const cell = document.createElement("th");
+        cell.className = "border border-border p-2";
+        cell.rowSpan = col.subColumns ? 1 : col.rowspan || rowSpan;
+        cell.colSpan = col.subColumns ? col.colspan || col.subColumns.length : col.colspan || 1;
+        cell.textContent = col.label;
+        rows[depth].push(cell);
+
+        if (col.subColumns) {
+          col.subColumns.forEach((subCol) => processColumn(subCol, depth + 1));
+        }
+      };
+
+      columns.forEach((col) => processColumn(col));
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell) => tr.appendChild(cell));
+        tableHeader.appendChild(tr);
+      });
+    };
+
+    const createBody = (data) => {
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
+    row.forEach((cellData) => {
+      const td = document.createElement("td");
+      td.className = "border border-border p-2";
+      td.textContent = cellData;
+      tr.appendChild(td);
+    });
+    tableBody.appendChild(tr);
+  });
+};
+
+    createHeader(tableConfig.columns);
+    createBody(tableConfig.data, tableConfig.columns);
+  </script>
+</body>
+</html>
